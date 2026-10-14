@@ -1,0 +1,33 @@
+name: 每日快照刷新（舆情 + 篮球）
+
+on:
+  schedule:
+    # 每天 23:00 UTC = 北京 07:00，用户醒来即是最新数据
+    - cron: "0 23 * * *"
+  # 允许在 GitHub 仓库的 Actions 页面手动点一下立即触发
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 抓取篮球数据（ESPN 官方）
+        run: python basketball.py
+
+      - name: 回填队徽/背景图（GHA 无客户端上传脚本，复用线上已有图片）
+        run: python merge_basketball_logos.py
+
+      - name: 刷新舆情/热榜快照并合并篮球
+        run: python refresh_snapshot.py
