@@ -1,6 +1,6 @@
 # 工作台每日快照自动刷新（GitHub Actions）
 
-把「全网舆情 + 篮球数据」的刷新从「手动喊一声」变成「每天自动跑」，无需本地开电脑。
+把工作台所有「需要刷新的信息模块」（微博/百度热榜、60s要闻、AI简报、每日一句、全网舆情+知乎、篮球、虎扑）从「手动喊一声」变成「每 2 小时自动跑」，无需本地开电脑——任务跑在 GitHub 服务器上，关电脑也照常更新。
 
 数据源：`refresh_snapshot.py` / `basketball.py` 抓取后写入 textdb 快照，工作台页面直接读取该快照。
 
@@ -9,7 +9,7 @@
 - `refresh_snapshot.py` —— 抓取 60s 要闻 / AI 简报 / 微博 / 百度 / 知乎 热榜，生成 `opinion` 舆情字段，并合并篮球数据，POST 整份快照。
 - `basketball.py` —— 从 ESPN 官方 API 抓杨瀚森/开拓者赛程、赛果、新闻，写出 `assets/basketball.json`。
 - `merge_basketball_logos.py` —— **仅用于云端自动化**：本地客户端能把队徽转存到图床得到 URL，但 GitHub 的 Linux runner 上没有这个上传脚本，队徽字段会为空；本脚本用线上快照里已有的稳定图片字段（logos/bg/porLogo/球员照）回填，避免刷新后图片变空。
-- `.github/workflows/daily-refresh.yml` —— 每天 23:00 UTC（北京 07:00）自动执行上面的三步；也支持在 Actions 页面手动触发。
+- `.github/workflows/daily-refresh.yml` —— 每 2 小时（北京 0/2/4…22 点整，UTC 为 `0 */2 * * *`）自动执行上面的三步；也支持在 Actions 页面手动触发。
 
 无需任何第三方依赖（全是 Python 标准库），无需任何密钥（textdb 快照为免密读写）。
 
@@ -27,7 +27,7 @@
    git push -u origin main
    ```
 3. 打开仓库的 **Actions** 标签页，启用 Workflow（首次推送后默认可能需点一下 "I understand..." 启用）。
-4. 之后每天北京 07:00 自动刷新；想立刻看效果，去 Actions 页面点 **Run workflow** 手动触发一次。
+4. 之后每 2 小时自动刷新；想立刻看效果，去 Actions 页面点 **Run workflow** 手动触发一次。
 
 ## 验证
 
