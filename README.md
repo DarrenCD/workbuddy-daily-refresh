@@ -34,6 +34,7 @@
 本地也可直接复现云端逻辑（需本机装了 WorkBuddy 客户端才有队徽上传，否则队徽为空但脚本不崩）：
 
 ```bash
+python hupu.py
 python basketball.py
 python merge_basketball_logos.py
 python refresh_snapshot.py
@@ -41,6 +42,10 @@ python refresh_snapshot.py
 
 ## 注意事项
 
-- 虎扑热榜（`hupu.py`）未纳入自动刷新：本仓的 `refresh_snapshot.py` 在找不到 `assets/hupu.json` 时会**沿用线上旧数据**，不会清空。如需每日刷新虎扑，把 `hupu.py` 也加进仓库并在 workflow 里 `basketball.py` 之前跑一步 `python hupu.py` 即可。
-- 若日后改了 `refresh_snapshot.py` / `basketball.py`，请在本仓库里改并推送，云端才会用新版。本仓库是自动化脚本的「唯一真源」。
+- 虎扑热榜（`hupu.py`）**已纳入自动刷新**：抓取「开拓者专区 · 24 小时榜」的榜单 + 前 8 帖正文/亮评/评论，写入 `assets/hupu.json`，再由 `refresh_snapshot.py` 裁剪后并入快照的 `hupu` 字段。
+  - bbs.hupu.com 走阿里云 WAF，机房 IP 有被拦概率。脚本对策：Cookie 会话预热 + 完整浏览器头 + 请求间隔 ≥1s + 验证页退避重试。
+  - 若仍被拦导致榜单条数不足，脚本**不写 `assets/hupu.json`** 并以退出码 1 结束；workflow 里配了 `continue-on-error: true`，`refresh_snapshot.py` 会自动沿用线上旧数据，不会清空。
+  - 榜单分页是前端路由，服务端只返回第一页（当前约 32 条），属正常现象。
+  - `assets/` 已被 `.gitignore` 忽略，抓取产物不入库。
+- 若日后改了 `refresh_snapshot.py` / `basketball.py` / `hupu.py`，请在本仓库里改并推送，云端才会用新版。本仓库是自动化脚本的「唯一真源」。
 - 想改刷新时间：编辑 `daily-refresh.yml` 里的 `cron`（注意是 UTC）。
