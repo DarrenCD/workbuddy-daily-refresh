@@ -24,6 +24,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: 抓取虎扑热榜（开拓者专区 24 小时榜）
+        # 虎扑走阿里云 WAF，机房 IP 有被拦概率：hupu.py 被拦时不会写 assets/hupu.json，
+        # refresh_snapshot.py 会自动沿用线上旧虎扑数据（不清空），所以这里用 continue-on-error。
+        continue-on-error: true
+        run: python hupu.py
+
       - name: 抓取篮球数据（ESPN 官方）
         run: python basketball.py
 

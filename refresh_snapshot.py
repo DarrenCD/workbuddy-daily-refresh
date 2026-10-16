@@ -279,7 +279,7 @@ if hp is None:
 payload = {"ts": int(time.time() * 1000), "date": date_str, "hero": hero, "weibo": weibo, "news": news,
            "ai": ai, "todayKey": today_key, "today": today,
            "opinion": {"batch": collected_at, "summary": summary, "rows": rows}, "baidu": baidu,
-           "basketball": bb, "hupu": hp}
+           "basketball": bb or old.get("basketball"), "hupu": hp}
 body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
 print("\nPAYLOAD bytes=%d news=%d ai=%d weibo=%d baidu=%d zhihu=%d rows=%d today=%d" %
       (len(body), len(news), len(ai), len(weibo), len(baidu), len(zhihu), len(rows), len(today)))
